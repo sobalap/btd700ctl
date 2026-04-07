@@ -1,10 +1,11 @@
 ## btd700ctl
 ### unofficial linux driver for the **Sennheiser BTD 700** dongle
 
-This project provides an interface for the missing dongle control functionality for Linux, equivalent to Sennheiser Dongle Control software. \
-It includes a [C++ example](example.cpp) demonstrating the library's features.
+This project provides an interface for the missing dongle control functionality for Linux, equivalent to Sennheiser Dongle Control software.
 
-*This project is not affiliated with Sennheiser.*
+Additionally, it includes:
+- a [C++ example](example.cpp) demonstrating the library's features.
+- a [daemon](daemon/) that automatically switches the audio sink based on dongle connection state
 
 ## features
 - ✅ audio mode control
@@ -55,13 +56,24 @@ cmake ..
 make
 sudo make install
 ```
-
-## ⚠️ udev rules for non-root access
+## udev rules for non-root access
 
 ```bash
 sudo cp udev/99-btd700.rules /etc/udev/rules.d/
 sudo udevadm control --reload-rules
 sudo udevadm trigger
+```
+
+## daemon
+
+`btd700d` automatically switches your default PipeWire audio sink to the BTD700 when a bluetooth device connects, and restores the previous sink on disconnect.
+
+```bash
+# run manually
+btd700d
+
+# or install as a systemd user service
+systemctl --user enable --now btd700d.service
 ```
 
 ## thanks to

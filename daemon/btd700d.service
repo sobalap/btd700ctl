@@ -1,0 +1,12 @@
+[Unit]
+Description=BTD700 PipeWire sink switcher
+After=pipewire.service wireplumber.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/btd700d
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
