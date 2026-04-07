@@ -3,39 +3,29 @@
 
 This project provides an interface for the missing dongle control functionality for Linux, equivalent to Sennheiser Dongle Control software.
 
-Additionally, it includes:
-- a [C++ example](example.cpp) demonstrating the library's features.
-- a [daemon](daemon/) that automatically switches the audio sink based on dongle connection state
-
 ## features
-- ✅ audio mode control
-  - audio modes (high quality / low latency / broadcast)
-  - codec selection
-  - bluetooth connection mode control
-- ✅ device features and status queries
-- ✅ event monitoring (connection, codec changes, etc.)
-- ✅ force (dis)connection of known devices
-- ✅ factory reset
+- audio mode control (high quality / low latency / broadcast)
+- codec selection
+- bluetooth connection mode control
+- device features and status queries
+- event monitoring (connection, codec changes, etc.)
+- force (dis)connection of known devices
+- factory reset
+- [PipeWire sink switching daemon](daemon/)
 
-## misssing features
-- [ ] software updates
-- [ ] broadcast settings
+### missing
+- software updates
+- broadcast settings
+- BTD 600 support (?)
 
-## known bugs
-- ⚠️ "Is gaming mode available" feature doesn't work, you can still set the gaming mode fine
+### known bugs
+- "Is gaming mode available" query doesn't work, but setting gaming mode works fine
 
-## contribute
-Pull requests welcome! Don't hesitate to contact me if you need any help with the implementation
+## getting started
 
-## supported devices
+### requirements
 
-This software was tested and proven to work using a BTD 700 dongle. \
-It might work with the BTD 600 with some slight modification. \
-If you happen to own one, and are interested in making it work then feel free to message me / contribute.
-
-## requirements
-
-- C99
+- C99 compiler
 - cmake
 - hidapi-hidraw
 
@@ -49,14 +39,17 @@ sudo pacman -S base-devel cmake hidapi
 # fedora
 sudo dnf install gcc cmake hidapi-devel
 ```
-## build
+
+### build
+
 ```bash
 mkdir build && cd build
 cmake ..
 make
 sudo make install
 ```
-## udev rules for non-root access
+
+### udev rules for non-root access
 
 ```bash
 sudo cp udev/99-btd700.rules /etc/udev/rules.d/
@@ -76,9 +69,14 @@ btd700d
 systemctl --user enable --now btd700d.service
 ```
 
+## contributing
+
+Pull requests welcome! Don't hesitate to contact me if you need any help with the implementation.
+
 ## thanks to
 - dnSpy/ILSpy contributors
 - all the good people of the world
 
 ## license
-**btd700ctl** is distributed under the GNU LGPL-2.1 License. please see the [LICENSE](LICENSE) file for more details.
+
+**btd700ctl** is distributed under the GNU LGPL-2.1 License. See the [LICENSE](LICENSE) file for details.
