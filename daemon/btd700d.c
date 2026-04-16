@@ -95,8 +95,16 @@ static void restore_sink(void) {
     if (!g_sink_switched) return;
 
     if (g_saved_sink_id >= 0) {
-        set_default_sink(g_saved_sink_id);
-        fprintf(stderr, "btd700d: restored default sink to node %d\n", g_saved_sink_id);
+        int btd_id = -1, default_id = -1;
+        find_sinks(&btd_id, &default_id);
+
+        if (btd_id >= 0 && default_id == btd_id) {
+            set_default_sink(g_saved_sink_id);
+            fprintf(stderr, "btd700d: restored default sink to node %d\n", g_saved_sink_id);
+        } else {
+            fprintf(stderr, "btd700d: sink already changed (current %d, btd700 %d), skipping restore\n",
+                    default_id, btd_id);
+        }
     }
 
     g_sink_switched = 0;
