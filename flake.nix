@@ -42,6 +42,11 @@
       nixosModules.default = { pkgs, ... }: {
         services.udev.packages = [ self.packages.${pkgs.system}.default ];
         environment.systemPackages = [ self.packages.${pkgs.system}.default ];
+        systemd.packages = [ self.packages.${pkgs.system}.default ];
+        systemd.user.services.btd700d = {
+          wantedBy = [ "default.target" ];
+          serviceConfig.ExecStart = "${self.packages.${pkgs.system}.default}/bin/btd700d";
+        };
       };
     };
 }
