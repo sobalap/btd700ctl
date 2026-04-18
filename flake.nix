@@ -22,13 +22,15 @@
 
             src = ./.;
 
-            nativeBuildInputs = with pkgs; [ cmake pkg-config ];
+            nativeBuildInputs = with pkgs; [ cmake pkg-config makeWrapper ];
             buildInputs = with pkgs; [ hidapi ];
 
             postInstall = ''
               install -Dm644 ../udev/99-btd700.rules -t $out/lib/udev/rules.d/
               substituteInPlace $out/lib/systemd/user/btd700d.service \
                 --replace-fail "/usr/local/bin/btd700d" "$out/bin/btd700d"
+              wrapProgram $out/bin/btd700d \
+                              --prefix PATH : ${pkgs.wireplumber}/bin
             '';
 
             meta = with pkgs.lib; {
