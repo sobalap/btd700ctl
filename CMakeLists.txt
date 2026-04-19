@@ -16,6 +16,8 @@ add_library(btd700ctl
     src/btd700.c
 )
 
+set_target_properties(btd700ctl PROPERTIES VERSION 0.0.0 SOVERSION 0)
+
 if(BUILD_SHARED_LIBS)
     target_compile_definitions(btd700ctl PRIVATE BTD700CTL_BUILD)
 endif()
