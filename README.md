@@ -38,6 +38,19 @@ sudo pacman -S base-devel cmake hidapi
 
 # fedora
 sudo dnf install gcc cmake hidapi-devel
+
+# nix
+    inputs = {
+        btd700ctl = {
+          url = "github:sobalap/btd700ctl";
+          inputs.nixpkgs.follows = "nixpkgs";
+        };
+    }
+    
+    modules = [
+        inputs.btd700ctl.nixosModules.default
+    ]
+    
 ```
 
 ### build
