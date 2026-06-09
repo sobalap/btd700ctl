@@ -38,7 +38,7 @@
               homepage = "https://github.com/sobalap/btd700ctl";
               license = licenses.lgpl21Only;
               platforms = platforms.linux;
-              mainProgram = "btd700ctl";
+              mainProgram = "btd700d";
             };
           };
         });
