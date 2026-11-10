@@ -1,0 +1,7 @@
+{
+  "uuid": "btd700@btd700ctl",
+  "name": "BTD 700",
+  "description": "Quick Settings toggle to connect/disconnect headphones paired with a Sennheiser BTD 700 dongle. Requires the btd700ctl command line tool.",
+  "shell-version": ["45", "46", "47", "48"],
+  "url": "https://github.com/sobalap/btd700ctl"
+}

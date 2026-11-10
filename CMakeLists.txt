@@ -59,3 +59,19 @@ target_compile_features(btd700d PRIVATE c_std_99)
 install(TARGETS btd700d RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(FILES daemon/btd700d.service DESTINATION lib/systemd/user)
 
+
+# command line tool
+add_executable(btd700ctl-cli cli/btd700ctl.c)
+set_target_properties(btd700ctl-cli PROPERTIES OUTPUT_NAME btd700ctl)
+target_link_libraries(btd700ctl-cli PRIVATE btd700ctl::btd700ctl)
+target_compile_features(btd700ctl-cli PRIVATE c_std_99)
+
+install(TARGETS btd700ctl-cli RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# gnome shell extension (install per user, see README)
+option(INSTALL_GNOME_EXTENSION "Install the GNOME Shell extension system-wide" OFF)
+if(INSTALL_GNOME_EXTENSION)
+    install(DIRECTORY gnome-extension/btd700@btd700ctl
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/gnome-shell/extensions
+    )
+endif()
