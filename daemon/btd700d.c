@@ -8,6 +8,7 @@
 static volatile sig_atomic_t g_running = 1;
 static int g_saved_sink_id = -1;
 static int g_sink_switched = 0;
+static int g_auto_connect = 0;
 
 static void signal_handler(int sig) {
     (void)sig;
@@ -132,12 +133,50 @@ static void on_event(const btd700_event_t* event, void* user_data) {
     }
 }
 
+/* called whenever the dongle (re)appears: sync the sink and, if requested,
+ * ask the dongle to pull the headset over (e.g. when docking at the office) */
+static void on_dongle_attached(btd700_driver_t* drv) {
+    btd700_dongle_state_t state;
+    if (btd700_driver_state(drv, &state) != BTD700_OK)
+        return;
+
+    if (state == BTD700_STATE_CONNECTED ||
+        state == BTD700_STATE_STREAMING_AUDIO) {
+        switch_to_btd700();
+    } else if (g_auto_connect && state == BTD700_STATE_DISCONNECTED) {
+        fprintf(stderr, "btd700d: auto-connecting headset\n");
+        btd700_error_t err = btd700_driver_trigger_connect(drv);
+        if (err != BTD700_OK)
+            fprintf(stderr, "btd700d: auto-connect: %s\n", btd700_error_string(err));
+    }
+}
+
 static void interruptible_sleep(int seconds) {
     for (int i = 0; i < seconds * 10 && g_running; i++)
         usleep(100000);
 }
 
+static void usage(FILE* out) {
+    fprintf(out,
+        "usage: btd700d [--auto-connect]\n"
+        "\n"
+        "  --auto-connect   connect the headset whenever the dongle is plugged in\n"
+        "                   (or the daemon starts) and the headset isn't connected\n");
+}
+
 int main(int argc, char* argv[]) {
+    for (int i = 1; i < argc; i++) {
+        if (!strcmp(argv[i], "--auto-connect")) {
+            g_auto_connect = 1;
+        } else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
+            usage(stdout);
+            return 0;
+        } else {
+            usage(stderr);
+            return 2;
+        }
+    }
+
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = signal_handler;
@@ -166,14 +205,7 @@ int main(int argc, char* argv[]) {
 
     fprintf(stderr, "btd700d: connected to dongle\n");
     btd700_driver_set_event_callback(drv, on_event, NULL);
-
-    btd700_dongle_state_t initial;
-    if (btd700_driver_state(drv, &initial) == BTD700_OK) {
-        if (initial == BTD700_STATE_CONNECTED ||
-            initial == BTD700_STATE_STREAMING_AUDIO) {
-            switch_to_btd700();
-        }
-    }
+    on_dongle_attached(drv);
 
     // event loop
     int stable = 0;
@@ -194,14 +226,7 @@ int main(int argc, char* argv[]) {
             if (g_running) {
                 fprintf(stderr, "btd700d: reconnected\n");
                 btd700_driver_set_event_callback(drv, on_event, NULL);
-
-                btd700_dongle_state_t state;
-                if (btd700_driver_state(drv, &state) == BTD700_OK) {
-                    if (state == BTD700_STATE_CONNECTED ||
-                        state == BTD700_STATE_STREAMING_AUDIO) {
-                        switch_to_btd700();
-                    }
-                }
+                on_dongle_attached(drv);
             }
         } else {
             stable = 1;
